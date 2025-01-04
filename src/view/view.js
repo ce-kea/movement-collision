@@ -47,6 +47,7 @@ function initBoard(board) {
   document.documentElement.style.setProperty("--row-num", board.tiles.rowNum);
   document.documentElement.style.setProperty("--col-num", board.tiles.colNum);
   document.documentElement.style.setProperty("--tile-size", board.tileSize);
+  document.documentElement.style.setProperty("--sight-range", board.sightRange);
 
   return boardElement;
 }
@@ -97,10 +98,15 @@ export function displayCharacter(character, controls, board) {
   }
 
   if (controller.debugModeOn()) {
-    debugRenderer.showHitBox(character);
+    if (!character.enemy) {
+      debugRenderer.showHitBox(character);
+    }
     debugRenderer.showRect(character);
     debugRenderer.showReg(character);
     debugRenderer.showGridOutline();
+    if (character.enemy) {
+      debugRenderer.showLineOfSight(character);
+    }
   } else {
     debugRenderer.clearAll(character);
   }
@@ -212,4 +218,12 @@ function hideStatbar() {
 function showStatbar() {
   const statbar = document.querySelector("#statbar");
   statbar.classList.remove("hidden");
+}
+
+export function enemyFollowsPlayer(enemy) {
+  enemy.element.classList.add("follow");
+}
+
+export function enemyStopsFollowingPlayer(enemy) {
+  enemy.element.classList.remove("follow");
 }

@@ -1,4 +1,5 @@
 import Board from "../model/Board.js";
+import Character from "../model/Character.js";
 
 export default class CollisionSystem {
   /**
@@ -68,6 +69,29 @@ export default class CollisionSystem {
     return false;
   }
 
-  // TODO EMIL: implement
-  inLineOfSight(charA, charB) {}
+  /**
+   * Checks if charA has line of sight of charB
+   * @param {Character} charA
+   * @param {Character} charB
+   * @param {Board} board
+   */
+  inLineOfSight(charA, charB, board) {
+    // calculate straight line distance in pixels between charA and charB
+    const straightLineDistance = Math.hypot(
+      charB.x - charA.x,
+      charB.y - charA.y
+    );
+    if (straightLineDistance > board.sightRange) {
+      return false;
+    }
+    // get tiles between the two characters to check if any blocks vision
+    const tilesBetween = board.getTilesBetween(charA, charB);
+    let visionBlocked = false;
+    tilesBetween.forEach((t, i) => {
+      if (t.blocksVision) {
+        visionBlocked = true;
+      }
+    });
+    return !visionBlocked;
+  }
 }

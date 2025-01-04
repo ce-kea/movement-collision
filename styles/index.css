@@ -8,6 +8,7 @@
   --hitboxY: 12;
   --regX: 16;
   --regY: 28;
+  --sight-range: 500;
 }
 
 body {
@@ -206,6 +207,24 @@ body {
   height: 3px;
 
   translate: calc(var(--regX) * 1px) calc(var(--regY) * 1px);
+}
+
+.show-line-of-sight::after {
+  content: "";
+  position: absolute;
+  top: calc(var(--sight-range) * -1px); /* Move the circle up by its radius */
+  left: calc(
+    var(--sight-range) * -1px
+  ); /* Move the circle left by its radius */
+  width: calc(var(--sight-range) * 2px); /* Diameter of the circle */
+  height: calc(var(--sight-range) * 2px); /* Diameter of the circle */
+  border: 2px solid blue; /* Circle outline */
+  border-radius: 50%; /* Make it a circle */
+  pointer-events: none; /* Ensure it doesn't interfere with mouse events */
+}
+
+.follow {
+  filter: drop-shadow(0 0 5px red);
 }
 
 .show-rect {

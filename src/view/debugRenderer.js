@@ -41,6 +41,11 @@ export function showRect(character) {
   character.element.classList.add("show-rect");
 }
 
+export function showLineOfSight(character) {
+  if (!enabled) return;
+  character.element.classList.add("show-line-of-sight");
+}
+
 export function showGridOutline() {
   if (!enabled) return;
   document
@@ -62,6 +67,7 @@ function clearDebugStyles(character) {
     character.element.classList.remove("show-hitbox");
     character.element.classList.remove("show-reg");
     character.element.classList.remove("show-rect");
+    character.element.classList.remove("show-line-of-sight");
   }
   document.querySelectorAll(".tile").forEach((t) => {
     t.classList.remove("show-grid-outline");

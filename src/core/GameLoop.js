@@ -55,7 +55,18 @@ export default class GameLoop {
     this.enemies.forEach((enemy) => {
       this.view.displayCharacter(enemy, enemy.controls, this.board);
 
-      const path = aStar(enemy, this.player, this.board, manhattanDistance);
+      let path = [];
+      const inSight = this.collisionSystem.inLineOfSight(
+        this.player,
+        enemy,
+        this.board
+      );
+      if (inSight) {
+        this.view.enemyFollowsPlayer(enemy);
+        path = aStar(enemy, this.player, this.board, manhattanDistance);
+      } else {
+        this.view.enemyStopsFollowingPlayer(enemy);
+      }
 
       highlightTiles(path);
       if (this.accumulator > Math.random() * 500 && path.length < 1) {

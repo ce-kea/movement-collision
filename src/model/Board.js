@@ -3,6 +3,8 @@ import Tile from "./Tile.js";
 export default class Board {
   element;
 
+  sightRange = 350;
+
   // board dimensions
   width;
   height;
@@ -95,5 +97,62 @@ export default class Board {
       this.getCoordFromPos(botLeft),
       this.getCoordFromPos(botRight),
     ];
+  }
+
+  /**
+   * Get the tiles between two positions, using the Bresenham's line algorithm
+   * @param {{x:number, y:number}} posA
+   * @param {{x:number, y:number}} posB
+   * @returns {Tile[]} tiles between the two positions
+   */
+  getTilesBetween(posA, posB) {
+    // get start and end coords in the grid
+    const start = this.getCoordFromPos(posA);
+    const end = this.getCoordFromPos(posB);
+
+    const tiles = [];
+
+    // calculate differences
+    const dx = Math.abs(end.col - start.col);
+    const dy = Math.abs(end.row - start.row);
+
+    // determine direction of the line
+    // sx positive means moving right, negative means moving left
+    const sx = start.col < end.col ? 1 : -1;
+    // sy positive means moving down, negative means moving up
+    const sy = start.row < end.row ? 1 : -1;
+
+    // error value
+    let deviation = dx - dy;
+
+    // set current coords
+    let currentCol = start.col;
+    let currentRow = start.row;
+    while (true) {
+      // add current coords to result
+      tiles.push(this.tiles.get(currentRow, currentCol));
+
+      // check if we reached the end
+      if (currentCol === end.col && currentRow === end.row) {
+        break;
+      }
+
+      // calculate error for next step
+      const d2 = 2 * deviation;
+
+      // step in x direction
+      if (d2 > -dy) {
+        deviation -= dy;
+        currentCol += sx;
+      }
+
+      // step in y direction
+      if (d2 < dx) {
+        deviation += dx;
+        currentRow += sy;
+      }
+    }
+
+    return tiles;
   }
 }
