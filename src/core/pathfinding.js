@@ -24,12 +24,47 @@ export function manhattanDistance(a, b) {
 }
 
 /**
- * calculates optimal path from start to goal
- * @param {{x: number, y: number}} start start position (enemy position)
- * @param {{x: number, y: number}} goal goal position (player position)
- * @param {Board} board game board
- * @param {(a: {row: number, col: number}, b: {row: number, col: number}) => number} h heuristics funtion to estimate cost to reach goal
- * @returns {{row:number, col:number}[]} path from start to goal in grid coordinates
+ * Implements the A* pathfinding algorithm to find the optimal path between two points on a game board.
+ * The algorithm navigates through a tile-based grid where each tile type has specific properties:
+ * - Traversable tiles (grass, floor, path) have weight = 1
+ * - Obstacles (walls, water, cliffs) have weight = Infinity
+ * - Movement is restricted to orthogonal directions (no diagonals)
+ *
+ * The algorithm works by minimizing f(n) = g(n) + h(n) where:
+ * - g(n): Actual cost from start to node n (sum of tile weights)
+ * - h(n): Manhattan distance to goal (optimal heuristic for grid with only orthogonal movement)
+ * - f(n): Total estimated path cost through node n
+ *
+ * Data Structures:
+ * - PriorityQueue: MinHeap-based queue that maintains nodes ordered by fScore
+ *   * Each node contains grid coordinates and priority (fScore)
+ *   * Ensures we always process the most promising path first
+ *   * Provides O(log n) insertion and extraction
+ * - openSetCoords: Set of coordinates we've seen but not yet processed
+ * - gScore/fScore: Maps using coordinate keys to track path costs
+ * - cameFrom: Map to reconstruct the optimal path
+ *
+ * Process:
+ * 1. Convert start/goal from pixel coordinates to grid coordinates
+ * 2. Initialize start node:
+ *    - gScore = 0
+ *    - fScore = manhattan distance to goal
+ *    - Add to priority queue with fScore as priority
+ * 3. While priority queue not empty:
+ *    - Dequeue node with lowest fScore
+ *    - If goal reached, reconstruct and return path
+ *    - For each neighbor:
+ *      * Calculate new gScore through current node
+ *      * If new path is better:
+ *        - Update gScore and fScore
+ *        - Enqueue with new fScore as priority
+ *
+ * @param {{x: number, y: number}} start Starting pixel position
+ * @param {{x: number, y: number}} goal Goal pixel position
+ * @param {Board} board Game board for coordinate conversion and tile access
+ * @param {(a: {row: number, col: number}, b: {row: number, col: number}) => number} h
+ *        Manhattan distance function (optimal heuristic for grid movement)
+ * @returns {{row:number, col:number}[]} Optimal path in grid coordinates, or empty array if no path exists
  */
 export function aStar(start, goal, board, h) {
   const startCoords = board.getCoordFromPos(start);
@@ -75,10 +110,10 @@ export function aStar(start, goal, board, h) {
         const newFScore = tentativeGScore + h(neighbour, goalCoords);
         fScore[neighbourKey] = newFScore;
         if (!openSetCoords.has(neighbourKey)) {
-            openSet.enqueue(neighbour, newFScore);
-            openSetCoords.add(neighbourKey);
+          openSet.enqueue(neighbour, newFScore);
+          openSetCoords.add(neighbourKey);
         }
-    }
+      }
     }
   }
   return [];
